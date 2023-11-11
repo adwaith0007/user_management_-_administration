@@ -21,18 +21,18 @@ user_route.set('views','./views/users');
 
 const userController = require ("../controllers/userController");
 
-user_route.get("/register", auth.isLogout, userController.loadregister );
+user_route.get("/register", auth.isLogout, userController.loadregister_get );
 
-user_route.post("/register",userController.insertUser);
+user_route.post("/register",userController.insertUser_post);
 
 
 
-user_route.get('/',userController.loginLoad);
-user_route.get('/login',userController.loginLoad);
+user_route.get('/',userController.loginLoad_get);
+user_route.get('/login',userController.loginLoad_get);
 
-user_route.post('/login',userController.verifyLogin);
+user_route.post('/login',userController.verifyLogin_post);
 
-user_route.get('/logout',auth.isLogin,userController.userLogout)
+user_route.get('/logout',auth.isLogin,userController.userLogout_get)
 
 
 

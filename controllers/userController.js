@@ -57,7 +57,7 @@ const sendVerifyMail = async(name,email,user_id)=>{
 
 
 
-const loadregister= async (req,res)=>{
+const loadregister_get= async (req,res)=>{
     try{
         res.render("registration")
     } catch(error){
@@ -65,7 +65,7 @@ const loadregister= async (req,res)=>{
     }
 } 
 
-const insertUser=async(req,res)=>{
+const insertUser_post=async(req,res)=>{
     console.log(req.body)
     try {
         const spassword = await securePassword(req.body.password);
@@ -94,7 +94,7 @@ const insertUser=async(req,res)=>{
 
 // login user methods
 
-const loginLoad = async(req,res)=>{
+const loginLoad_get = async(req,res)=>{
     try {
         res.render('login')
     } catch (error) {
@@ -116,7 +116,7 @@ const verifyMail = async (req,res)=>{
     }
 }
 
-const verifyLogin = async(req,res)=>{
+const verifyLogin_post = async(req,res)=>{
 
     try {
 
@@ -162,7 +162,7 @@ const verifyLogin = async(req,res)=>{
 }
 
 
-const userLogout= async(req,res)=>{
+const userLogout_get= async(req,res)=>{
     try {
         req.session.destroy();
         res.redirect('/')
@@ -173,5 +173,5 @@ const userLogout= async(req,res)=>{
 
 
 module.exports={
-    insertUser , loadregister,verifyMail,loginLoad, verifyLogin, userLogout
+    insertUser_post , loadregister_get,loginLoad_get, verifyLogin_post, userLogout_get,verifyMail
 }
