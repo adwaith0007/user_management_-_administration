@@ -10,6 +10,8 @@ const loginLoad = async(req,res)=>{
         console.log(error.message)
     }
 }
+
+
  const verifyLogin = async (req,res)=>{
     try {
        
@@ -21,7 +23,7 @@ const loginLoad = async(req,res)=>{
           const passwordMatch = await bcrypt.compare(password,userData.password)
         if(passwordMatch){
             
-            if(userData.is_admin===1){
+            if(userData.is_admin===0){
                 res.render('login',{message:'incorrect information'})
             }else{
                 req.session.user_id=userData._id;

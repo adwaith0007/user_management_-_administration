@@ -1,6 +1,10 @@
 const User=require('../models/userModel');
 const bcrypt = require("bcrypt");
-const nodemailer = require("nodemailer");
+const jwt = require('jsonwebtoken');
+
+
+
+
 
 const securePassword = async (password)=>{
 
@@ -15,47 +19,9 @@ const securePassword = async (password)=>{
 }
 
 
-// for send mail
-
-const sendVerifyMail = async(name,email,user_id)=>{
-    
-    try {
-        
-      const transporter =  nodemailer.createTransport({
-            host:"smtp.gmail.com",
-            port:465,
-            secure:false,
-            requireTLS:true,
-            auth:{
-                user:"adwaith.web@gmail.com",
-                pass:"grob tcmy eenp ccqf"
-
-            }
-        });
-
-        const mailOptions ={
-            from:'adwaith.web@gmail.com',
-            to:email,
-            subject:'For Verification mail',
-            html:'<p>Hii' + name+"please click</p>"
-        }
-       transporter.sendMail(mailOptions, function(error,info){
-            if(error){
-                console.log(error);
-            }
-            else{
-                console.log("Email has been sent:- " , info.response)
-            }
-       })
-
-    } catch (error) {
-
-        console.log(error.message);
-        
-    }
-}
 
 
+// *********************************** To render Register Page ***********************************
 
 const loadregister_get= async (req,res)=>{
     try{
@@ -65,8 +31,11 @@ const loadregister_get= async (req,res)=>{
     }
 } 
 
+
+// *********************************** To insert user data from register page ***********************************
+
 const insertUser_post=async(req,res)=>{
-    console.log(req.body)
+    // console.log(req.body)
     try {
         const spassword = await securePassword(req.body.password);
         const user = new User({
@@ -80,19 +49,14 @@ const insertUser_post=async(req,res)=>{
 
         const userData = await user.save();
 
-        if(userData){
-            sendVerifyMail(req.body.name, req.body.email, userData._id)
-            res.render('registration',{message:'registration successfull'})
-        }else{
-            res.render('registration',{message:'registration failed'})
-        }
+      
     } catch (error) {
         console.log(error.message)
     }
 }
 
 
-// login user methods
+// *********************************** To render Login Page ***********************************
 
 const loginLoad_get = async(req,res)=>{
     try {
@@ -102,19 +66,33 @@ const loginLoad_get = async(req,res)=>{
     }
 }
 
-const verifyMail = async (req,res)=>{
 
-    try{
 
-      const updateInfo = await  User.updateOne({_id:req.query.id},{$set:{is_verified:1}});
+const home_get = async(req,res)=>{
+    try {
 
-      console.log(updateInfo);
-      res.render("email-verified");
+        let userData = await User.findById(decodedToken.id)
 
-    } catch (error){
+
+        res.render('home',{user: userData})
+    } catch (error) {
         console.log(error.message);
     }
 }
+
+const maxAge = 3 * 24 * 60 * 60 ;
+const createToken = (id) => {
+    return jwt.sign({ id }, 'secretkey',{
+        expiresIn: maxAge
+    })
+}
+
+
+
+
+
+
+// *********************************** To verify user from Login Page ***********************************
 
 const verifyLogin_post = async(req,res)=>{
 
@@ -127,26 +105,34 @@ const verifyLogin_post = async(req,res)=>{
 
      if(userData){
 
-        console.log(`if true ${userData}`);
+        // console.log(`if true ${userData}`);
 
        const passwordMatch = await bcrypt.compare(password,userData.password);
 
-       console.log(passwordMatch);
+    //    console.log(passwordMatch);
 
        if (passwordMatch){
 
-        req.session.user_id = userData._id;
-        res.render('home',{ user: userData })
+        // jwt.sign({userData}, 'secretkey', (err, token)=>{
+        //   res.json({  token });
+        //   console.log(token);
+        // })
 
-            // if ( userData.is_verified === 1 ){
-            //     res.render('login',{message:"please verify your mail"})
-            // }
-            // else{
-            //     req.session.user_id = userData._id;
-            //     res.render('home',{ user: userData })
-                
+        // res.setHeader('Set-Cookie','hi');
 
-            // }
+        // res.cookie('newUser', true);
+
+        const token = createToken(userData._id);
+        res.cookie('jwt', token,{ httpOnly: true, maxAge: maxAge * 1000 });
+        res.status(201);
+        
+    //   ********************************************* remove this command good to go
+        // req.session.user_id = userData._id;
+        // res.render('home',{ user: userData })
+
+        res.redirect('/home')
+       
+           
        }
        else{
         res.render('login',{message:"Email and password is incorrect"});
@@ -162,6 +148,9 @@ const verifyLogin_post = async(req,res)=>{
 }
 
 
+// *********************************** To remove session when logedout ***********************************
+
+
 const userLogout_get= async(req,res)=>{
     try {
         req.session.destroy();
@@ -173,5 +162,6 @@ const userLogout_get= async(req,res)=>{
 
 
 module.exports={
-    insertUser_post , loadregister_get,loginLoad_get, verifyLogin_post, userLogout_get,verifyMail
+    insertUser_post , loadregister_get,loginLoad_get, verifyLogin_post, userLogout_get,home_get
+    // verifyMail
 }

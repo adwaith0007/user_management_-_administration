@@ -2,6 +2,8 @@ const express = require ("express");
 const app = express();
 const port = process.env.PORT || 5000;
 
+const cookiePraser = require('cookie-parser')
+app.use(cookiePraser());
 
 const mongoose = require ("mongoose");
 mongoose.connect("mongodb://127.0.0.1:27017/user_management_&_administration");
@@ -18,6 +20,7 @@ app.use((req, res, next) => {
     res.header('Pragma', 'no-cache');
     next();
 });
+
 
 
 app.set('view engine','ejs');
