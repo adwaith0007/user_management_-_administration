@@ -49,6 +49,8 @@ const insertUser_post=async(req,res)=>{
 
         const userData = await user.save();
 
+        res.redirect('login')
+
       
     } catch (error) {
         console.log(error.message)
@@ -60,7 +62,7 @@ const insertUser_post=async(req,res)=>{
 
 const loginLoad_get = async(req,res)=>{
     try {
-        res.render('login')
+        res.render('login',{message:""})
     } catch (error) {
         console.log(error.message);
     }
@@ -105,31 +107,17 @@ const verifyLogin_post = async(req,res)=>{
 
      if(userData){
 
-        // console.log(`if true ${userData}`);
-
        const passwordMatch = await bcrypt.compare(password,userData.password);
 
-    //    console.log(passwordMatch);
+    
 
        if (passwordMatch){
 
-        // jwt.sign({userData}, 'secretkey', (err, token)=>{
-        //   res.json({  token });
-        //   console.log(token);
-        // })
-
-        // res.setHeader('Set-Cookie','hi');
-
-        // res.cookie('newUser', true);
 
         const token = createToken(userData._id);
         res.cookie('jwt', token,{ httpOnly: true, maxAge: maxAge * 1000 });
         res.status(201);
         
-    //   ********************************************* remove this command good to go
-        // req.session.user_id = userData._id;
-        // res.render('home',{ user: userData })
-
         res.redirect('/home')
        
            

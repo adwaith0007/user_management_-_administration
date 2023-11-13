@@ -65,7 +65,7 @@ const home_get=(req,res,next)=>{
 
 const mainpage = (req,res,next)=>{
 
-    res.render('main')
+    res.render('main',{tocken:req.cookies.jwt})
 }
 
 
@@ -76,19 +76,24 @@ const mainpage = (req,res,next)=>{
 
 
 const isLogout_get = (req,res)=>{
-    res.cookie('jwt','',{maxAge:1});
+    // res.cookie('jwt','',{maxAge:1});
+    res.clearCookie('jwt');
     res.redirect('/');
 }
 
 
 const isLogin = async(req,res,next)=>{
     try {
+
+        const token = req.cookies.jwt;
         
-        if(req.session.user_id){
-            next();
-        }else{
+        if(token){
+            
             res.redirect('/');
-            return;
+        }else{
+
+            next();
+            // return;
         }
             
     } catch (error) {

@@ -30,11 +30,12 @@ user_route.post("/register",userController.insertUser_post);
 
 
 user_route.get('/',userMiddleware.mainpage);
-user_route.get('/login', userController.loginLoad_get,);
+
+user_route.get('/login', userMiddleware.isLogin , userController.loginLoad_get,);
+user_route.post('/login',userController.verifyLogin_post);
 
 user_route.get('/home', userMiddleware.home_get );
 
-user_route.post('/login',userController.verifyLogin_post);
 
 user_route.get('/logout',userMiddleware.isLogout_get)
 
